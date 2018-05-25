@@ -1,0 +1,106 @@
+<!--Aw yiss-->
+<!doctype html>
+<html>
+<head>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js"></script>
+    <script>
+            var socket = io();
+
+            socket.on('welcome', function(data) {
+                addMessage(data.message);
+
+                // Respond with a message including this clients' id sent from the server
+                //socket.emit('i am client', {data: 'foo!', id: data.id});
+            });
+            socket.on('time', function(data) {
+                addMessage(data.time);
+            });
+            socket.on('error', console.error.bind(console));
+            socket.on('message', console.log.bind(console));
+            socket.on("doorUpdate", function (data) {
+
+                var eventData = data.doorEvent;
+                DoorChange(eventData.doorAddress,eventData.doorValue);
+            });
+            function addMessage(message) {
+                var text = document.createTextNode(message),
+                    el = document.createElement('li'),
+                    messages = document.getElementById('messages');
+
+                el.appendChild(text);
+                messages.appendChild(el);
+            }
+    </script>
+</head>
+<body>
+    <h2>Door Status</h2>
+    <ul id='messages'></ul>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Door 1</th>
+            <th>Door 2</th>
+            <th>Door 3</th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach: Doors">
+        
+            <td>
+                
+                <p data-bind="text: DoorName"></p>
+                <img data-bind="attr:{src: ImagePath}"/>
+            </td>
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        function GarageViewModel(){
+            var self = this;
+            self.Doors = ko.observableArray();
+        };
+
+        function GarageDoor(doorName, doorIndex, doorStatus){
+            this.DoorName = ko.observable(doorName);
+            this.DoorIndex = ko.observable(doorIndex);
+            this.DoorStatus = ko.observable(doorStatus);
+            var doorPath = "";
+            if(doorStatus){
+                doorPath ="/content/open.png"
+            }
+            else{
+                doorPath = "/content/closed.png"
+            }
+            this.ImagePath = ko.observable(doorPath);
+
+        }
+        var door1 = new GarageDoor("Reagle",0,0);
+        var door2 = new GarageDoor("Truck",1,0,0);
+        var door3 = new GarageDoor("Pellets",2,0);
+
+        var garageViewModel = new GarageViewModel();
+        garageViewModel.Doors().push(door1);
+        garageViewModel.Doors().push(door2);
+        garageViewModel.Doors().push(door3);
+
+        function DoorChange(doorIndex, doorValue)
+        {
+            garageViewModel.Doors()[doorIndex -1].DoorStatus(doorValue);
+            
+            if(doorValue){
+                doorPath ="/content/open.png"
+            }
+            else{
+                doorPath = "/content/closed.png"
+            }
+            garageViewModel.Doors()[doorIndex -1].ImagePath(doorPath);
+        }
+
+        ko.applyBindings(garageViewModel)
+    </script>
+    
+
+</body>
+
+</html>

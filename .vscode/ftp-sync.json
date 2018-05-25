@@ -1,0 +1,16 @@
+{
+    "remotePath": "/home/pi/Documents/git/GarageDoor",
+    "host": "raspberrypi",
+    "username": "pi",
+    "password": "raspberry",
+    "port": 22,
+    "protocol": "sftp",
+    "uploadOnSave": true,
+    "passive": false,
+    "debug": false,
+    "privateKeyPath": null,
+    "ignore": [
+        "\\.vscode",
+        "\\.git"
+    ]
+}
